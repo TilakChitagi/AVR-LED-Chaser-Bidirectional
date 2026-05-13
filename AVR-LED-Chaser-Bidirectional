@@ -1,0 +1,36 @@
+/*
+ * Description: Moves a single lit LED back and forth across a row.
+ * Hardware: LEDs connected to pins PD2, PD3, PD4, PD5, PD6, and PD7.
+ * Logic: Uses loops to shift the active bit left and then right.
+ */
+
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void)
+{
+    // Set pins PD2 through PD7 as outputs
+    // 0b11111100 leaves PD0 and PD1 as inputs
+    DDRD = 0b11111100; 
+
+    while (1)
+    {
+        // Move the light from Right to Left (Pin 2 to Pin 7)
+        for (int i = 2; i <= 7; i++)
+        {
+            // (PORTD & 0b00000011) ensures we don't change pins 0 and 1
+            // (1 << i) puts a '1' at the current loop position
+            PORTD = (PORTD & 0b00000011) | (1 << i);
+            _delay_ms(200);
+        }
+
+        // Move the light from Left to Right (Pin 6 down to Pin 3)
+        // We stop at 3 to prevent the end LEDs from double-blinking
+        for (int i = 6; i >= 3; i--)
+        {
+            PORTD = (PORTD & 0b00000011) | (1 << i);
+            _delay_ms(200);
+        }
+    }
+}
